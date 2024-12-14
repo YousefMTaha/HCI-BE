@@ -1,4 +1,5 @@
 import cartModel from "../../../DB/model/Cart.model.js";
+import productModel from "../../../DB/model/Product.model.js";
 import { ModifyError } from "../../utils/classError.js";
 import { asyncHandler } from "../../utils/errorHandling.js";
 import { StatusCodes } from "http-status-codes";
@@ -29,20 +30,71 @@ export const add = asyncHandler(async (req, res, next) => {
         },
       });
 
-  return res.status(200).json({ message: "success" });
+  console.log({ ...req.cart });
+
+  return res
+    .status(200)
+    .json({ message: "success", numOfCartItems: req.cart._doc.length });
 });
 
 export const update = asyncHandler(async (req, res, next) => {
-  await cartModel.updateOne(
+  const cart = await cartModel.findOneAndUpdate(
     {
       _id: req.cart._id,
       "products.id": req.product._id,
     },
     {
       "products.$.quantity": req.body.quantity,
+    },
+    {
+      new: true,
     }
   );
-  return res.status(200).json({ message: "success" });
+
+  let totalCartPrice = 0;
+  // for (const product of cart.products) {
+  //   totalCartPrice += (product.quantity || 1) * product.id.price;
+  // }
+
+  const products = cart.products.map(async (ele) => {
+    ele.id = await productModel.findById(ele.id._id);
+    totalCartPrice += (ele.quantity || 1) * ele.id.price;
+    const images = ele.id._doc.images.map((ele) => {
+      return ele.secure_url;
+    });
+    return {
+      product: {
+        ...ele.id._doc,
+        title: ele.id._doc.name,
+        imageCover: ele.id._doc.imageCover.secure_url,
+        images,
+        ratingsQuantity: ele.id._doc.noRating,
+        ratingsAverage: ele.id._doc.totalRating / (ele.id._doc.noRating || 1),
+      },
+
+      price: (ele.quantity || 1) * ele.id.price,
+      count: ele.quantity || 1,
+    };
+  });
+
+  return res.status(200).json({
+    status: "success",
+    data: {
+      products,
+      totalCartPrice,
+      _id: req.user._id,
+    },
+    numOfCartItems: cart.products.length,
+  });
+
+  /*
+      data: {
+      products,
+      totalCartPrice,
+      _id: req.user._id,
+    },
+    numOfCartItems: cart.products.length,
+  */
 });
 
 export const remove = asyncHandler(async (req, res, next) => {
@@ -60,5 +112,40 @@ export const remove = asyncHandler(async (req, res, next) => {
   return res.status(200).json({ message: "success" });
 });
 
-export const get = async (req, res, next) =>
-  res.status(200).json({ message: "success", cart: req.cart });
+export const get = async (req, res, next) => {
+  console.log(req.cart);
+  const cart = req.cart;
+  console.log(cart.products);
+  // console.log(cart.products);
+  let totalCartPrice = 0;
+
+  const products = cart.products.map((ele) => {
+    totalCartPrice += (ele.quantity || 1) * ele.id.price;
+    const images = ele.id._doc.images.map((ele) => {
+      return ele.secure_url;
+    });
+    return {
+      product: {
+        ...ele.id._doc,
+        title: ele.id._doc.name,
+        imageCover: ele.id._doc.imageCover.secure_url,
+        images,
+        ratingsQuantity: ele.id._doc.noRating,
+        ratingsAverage: ele.id._doc.totalRating / (ele.id._doc.noRating || 1),
+      },
+
+      price: (ele.quantity || 1) * ele.id.price,
+      count: ele.quantity || 1,
+    };
+  });
+
+  return res.status(200).json({
+    status: "success",
+    data: {
+      products,
+      totalCartPrice,
+      _id: req.user._id,
+    },
+    numOfCartItems: cart.products.length,
+  });
+};

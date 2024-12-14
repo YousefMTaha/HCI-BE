@@ -38,6 +38,12 @@ const userSchema = new Schema(
     image: Object,
     DOB: String,
     code: String,
+    wishlist: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Product",
+      },
+    ],
   },
   {
     timestamps: true,

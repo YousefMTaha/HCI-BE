@@ -34,7 +34,7 @@ router.post(
 router.put(
   "/:productId",
   auth([userRoles.User]),
-  validation(validator.update),
+  // validation(validator.update),
   isExist({
     model: productModel,
     dataFrom: reqDataForms.parmas,

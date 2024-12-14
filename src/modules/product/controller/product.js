@@ -42,9 +42,22 @@ export const getProduct = asyncHandler(async (req, res, next) => {
     .findById(req.params._id)
     .populate("subcategoryId")
     .populate("createdBy");
+
+  const images = product._doc.images.map((ele) => {
+    return ele.secure_url;
+  });
+  const data = {
+    ...product._doc,
+    title: product._doc.name,
+    imageCover: product._doc.imageCover.secure_url,
+    images,
+    ratingsQuantity: product._doc.noRating,
+    ratingsAverage: product._doc.totalRating / (product._doc.noRating || 1),
+  };
+
   return res.status(200).json({
     message: "success",
-    product: product,
+    data,
   });
 });
 
@@ -53,9 +66,10 @@ export const getAllProducts = asyncHandler(async (req, res, next) => {
   //   .find()
   //   .populate("subcategoryId")
   //   .populate("createdBy");
-  const apiFeatures = new ApiFeatures(productModel.find(), req.query)
-    .filter()
-    .pagination();
+  const apiFeatures = new ApiFeatures(
+    productModel.find(),
+    req.query
+  ).pagination();
   const product = await apiFeatures.mongooseQuery;
 
   const products = product.map((ele) => {
@@ -74,15 +88,15 @@ export const getAllProducts = asyncHandler(async (req, res, next) => {
 
   // console.log(products);
 
-  if (!req.query.noDoc)
-    return next(new ModifyError("No data matched", StatusCodes.NOT_FOUND));
+  // if (!req.query.noDoc)
+  //   return next(new ModifyError("No data matched", StatusCodes.NOT_FOUND));
 
   // const noPage = countPage(req);
 
   return res.status(200).json({
     message: "success",
     data: products,
-    results: req.query.noDoc,
+    results: products.length,
     // NoPage: noPage,
     currentPage: req.query.page,
     limit: 5,

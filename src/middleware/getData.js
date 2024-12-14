@@ -34,13 +34,11 @@ export const getDataById = asyncHandler(async (req, res, next) => {
   const model = getModelFromUrl(req.originalUrl);
   const data = await model.findById(req.params._id);
   const resObj = {};
-  resObj.message = "done";
-  resObj[model.modelName] = data;
+  resObj.message = "success";
+  resObj["data"] = data;
   return data
     ? res.json(resObj)
-    : next(
-        new ModifyError(`No ${model.modelName} found`, StatusCodes.NOT_FOUND)
-      );
+    : next(new ModifyError(`No ${"data"} found`, StatusCodes.NOT_FOUND));
 });
 
 export const getModelFromUrl = (url) => {

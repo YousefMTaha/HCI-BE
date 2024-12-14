@@ -62,7 +62,7 @@ router
 
 router
   .route("/:_id")
-  .get(validation(IdValidator), getDataById)
+  .get(validation(IdValidator), productController.getProduct)
   .delete(
     auth([userRoles.Admin]),
     validation(IdValidator),
