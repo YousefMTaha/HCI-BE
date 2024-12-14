@@ -1,11 +1,16 @@
 import { Router } from "express";
-import { addToWishlist, deleteFromWishlist } from "./wishlist.controller.js";
+import {
+  addToWishlist,
+  deleteFromWishlist,
+  getwish,
+} from "./wishlist.controller.js";
 import auth from "../../middleware/auth.js";
 import { asyncHandler } from "../../utils/errorHandling.js";
 const wishlistRouter = Router();
 
 // add to wishlist
-wishlistRouter.put("/", auth(), asyncHandler(addToWishlist));
+wishlistRouter.post("/", auth(), asyncHandler(addToWishlist));
 
-wishlistRouter.put("/:productId", auth(), asyncHandler(deleteFromWishlist));
+wishlistRouter.delete("/:productId", auth(), asyncHandler(deleteFromWishlist));
+wishlistRouter.get("/", auth(), asyncHandler(getwish));
 export default wishlistRouter;

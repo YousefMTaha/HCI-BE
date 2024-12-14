@@ -30,11 +30,11 @@ export const add = asyncHandler(async (req, res, next) => {
         },
       });
 
-  console.log({ ...req.cart });
-
-  return res
-    .status(200)
-    .json({ message: "success", numOfCartItems: req.cart._doc.length });
+  return res.status(200).json({
+    status: "success",
+    message: "Product added to cart",
+    numOfCartItems: req.cart.products.length,
+  });
 });
 
 export const update = asyncHandler(async (req, res, next) => {
@@ -55,27 +55,31 @@ export const update = asyncHandler(async (req, res, next) => {
   // for (const product of cart.products) {
   //   totalCartPrice += (product.quantity || 1) * product.id.price;
   // }
+  const products = [];
 
-  const products = cart.products.map(async (ele) => {
-    ele.id = await productModel.findById(ele.id._id);
-    totalCartPrice += (ele.quantity || 1) * ele.id.price;
-    const images = ele.id._doc.images.map((ele) => {
+  for (const ele of cart.products) {
+    const product = await productModel.findById(ele.id._id);
+    // console.log(product);
+
+    totalCartPrice += (ele.quantity || 1) * product.price;
+    const images = product.images.map((ele) => {
       return ele.secure_url;
     });
-    return {
+
+    products.push({
       product: {
-        ...ele.id._doc,
-        title: ele.id._doc.name,
-        imageCover: ele.id._doc.imageCover.secure_url,
+        ...product._doc,
+        title: product._doc.name,
+        imageCover: product._doc.imageCover.secure_url,
         images,
-        ratingsQuantity: ele.id._doc.noRating,
-        ratingsAverage: ele.id._doc.totalRating / (ele.id._doc.noRating || 1),
+        ratingsQuantity: product._doc.noRating,
+        ratingsAverage: product._doc.totalRating / (product._doc.noRating || 1),
       },
 
-      price: (ele.quantity || 1) * ele.id.price,
+      price: (ele.quantity || 1) * product.price,
       count: ele.quantity || 1,
-    };
-  });
+    });
+  }
 
   return res.status(200).json({
     status: "success",
