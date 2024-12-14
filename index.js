@@ -10,6 +10,8 @@ app.use(morgan("tiny"), (req, res, next) => {
   console.log("body", req.body);
   console.log("param", req.params);
   console.log("query", req.query);
+  // console.log("headers", req.headers);
+
   next();
 });
 

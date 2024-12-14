@@ -3,6 +3,7 @@ import productModel from "../../../../DB/model/Product.model.js";
 import { ModifyError } from "../../../utils/classError.js";
 import { asyncHandler } from "../../../utils/errorHandling.js";
 import * as validation from "../product.middleware.js";
+import { ApiFeatures } from "../../../utils/apiFeatures.js";
 
 export const addProduct = asyncHandler(async (req, res, next) => {
   req.body.createdBy = req.user._id;
@@ -48,18 +49,43 @@ export const getProduct = asyncHandler(async (req, res, next) => {
 });
 
 export const getAllProducts = asyncHandler(async (req, res, next) => {
-  const products = await productModel
-    .find()
-    .populate("subcategoryId")
-    .populate("createdById");
-  const modifiedProducts = products.map((product) => ({
-    ...product.toObject(),
-    createdBy: product.createdById.name,
-    category: product.subcategoryId.name,
-  }));
+  // const products = await productModel
+  //   .find()
+  //   .populate("subcategoryId")
+  //   .populate("createdBy");
+  const apiFeatures = new ApiFeatures(productModel.find(), req.query)
+    .filter()
+    .pagination();
+  const product = await apiFeatures.mongooseQuery;
+
+  const products = product.map((ele) => {
+    const images = ele._doc.images.map((ele) => {
+      return ele.secure_url;
+    });
+    return {
+      ...ele._doc,
+      title: ele._doc.name,
+      imageCover: ele._doc.imageCover.secure_url,
+      images,
+      ratingsQuantity: ele._doc.noRating,
+      ratingsAverage: ele._doc.totalRating / (ele._doc.noRating || 1),
+    };
+  });
+
+  // console.log(products);
+
+  if (!req.query.noDoc)
+    return next(new ModifyError("No data matched", StatusCodes.NOT_FOUND));
+
+  // const noPage = countPage(req);
+
   return res.status(200).json({
     message: "success",
-    data: modifiedProducts,
+    data: products,
+    results: req.query.noDoc,
+    // NoPage: noPage,
+    currentPage: req.query.page,
+    limit: 5,
   });
 });
 

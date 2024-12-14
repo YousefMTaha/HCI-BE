@@ -17,9 +17,10 @@ const getAllData = (populateData = "") => {
     else data = await model.find();
 
     const resObj = {};
-    resObj.message = "done";
+    resObj.message = "success";
 
-    resObj[model.modelName] = data;
+    // resObj[model.modelName] = data;
+    resObj["data"] = data;
 
     return data.length
       ? res.status(StatusCodes.OK).json(resObj)
@@ -45,8 +46,8 @@ export const getDataById = asyncHandler(async (req, res, next) => {
 export const getModelFromUrl = (url) => {
   if (url.includes("user")) return userModel;
   if (url.includes("brand")) return brandModel;
-  if (url.includes("subcategory")) return subcategoryModel;
-  if (url.includes("category")) return categoryModel;
-  if (url.includes("product")) return productModel;
+  if (url.includes("subcategories")) return subcategoryModel;
+  if (url.includes("categories")) return categoryModel;
+  if (url.includes("products")) return productModel;
 };
 export default getAllData;

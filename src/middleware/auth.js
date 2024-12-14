@@ -16,14 +16,14 @@ const auth = (roles = Object.values(userRoles)) => {
         new ModifyError("token must be entered", StatusCodes.BAD_REQUEST)
       );
 
-    // validate the beaerer key
-    if (!token.startsWith(process.env.BEARER_KEY))
-      return next(
-        new ModifyError("invalid bearer key", StatusCodes.BAD_REQUEST)
-      );
+    // // validate the beaerer key
+    // if (!token.startsWith(process.env.BEARER_KEY))
+    //   return next(
+    //     new ModifyError("invalid bearer key", StatusCodes.BAD_REQUEST)
+    //   );
 
     // split the bearer key from original token =>  "bearer_token" => ["","token"]
-    token = token.split(process.env.BEARER_KEY)[1];
+    // token = token.split(process.env.BEARER_KEY)[1];
 
     // constract id from token
     const { id } = jwt.verify(token, process.env.TOKEN_SIGNATURE);

@@ -58,7 +58,7 @@ router
     productController.addProduct,
     uploadImage({ model: productModel, isFields: true })
   )
-  .get(getAllData(uniqueFields.category));
+  .get(productController.getAllProducts);
 
 router
   .route("/:_id")
