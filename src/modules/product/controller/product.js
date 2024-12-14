@@ -59,7 +59,7 @@ export const getAllProducts = asyncHandler(async (req, res, next) => {
   }));
   return res.status(200).json({
     message: "success",
-    products: modifiedProducts,
+    data: modifiedProducts,
   });
 });
 

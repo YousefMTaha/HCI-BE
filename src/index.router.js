@@ -27,8 +27,8 @@ const initApp = (app, express) => {
   //Setup API Routing
   app.use(`/auth`, authRouter);
   app.use(`/user`, userRouter);
-  app.use(`/product`, productRouter);
-  app.use(`/category`, categoryRouter);
+  app.use(`/products`, productRouter);
+  app.use(`/categories`, categoryRouter);
   app.use(`/subcategory`, subcategoryRouter);
   app.use(`/review`, reviewsRouter);
   app.use(`/coupon`, couponRouter);
