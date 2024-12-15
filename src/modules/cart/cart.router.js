@@ -1,6 +1,6 @@
 import { Router } from "express";
 import auth from "../../middleware/auth.js";
-import { add, get, remove, update } from "./cart.controller.js";
+import { add, clear, get, remove, update } from "./cart.controller.js";
 import { isExist } from "../../middleware/isExist.js";
 import productModel from "../../../DB/model/Product.model.js";
 import {
@@ -46,16 +46,18 @@ router.put(
 
 // delete product from cart
 router.delete(
-  "/",
+  "/:productId",
   auth([userRoles.User]),
   // validation(validator.remove),
   isExist({
     model: productModel,
-    dataFrom: reqDataForms.body,
+    dataFrom: reqDataForms.parmas,
     searchData: uniqueFields.productId,
   }),
   isProductExistInCart,
   remove
 );
+
+router.delete("/", auth([userRoles.User]), clear);
 
 export default router;

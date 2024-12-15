@@ -21,15 +21,7 @@ import Stripe from "stripe";
 
 const router = Router();
 
-router.get("/", auth(), async (req, res, next) => {
-  const orders = await orderModel
-    .find({ createdBy: req.user._id })
-    .populate("products.id");
-
-  return orders.length
-    ? res.status(200).json({ message: "success", orders })
-    : next(new ModifyError("no orders found", StatusCodes.NOT_FOUND));
-});
+router.get("/", auth(), orderController.getOrders);
 
 // Generate order
 
@@ -46,16 +38,7 @@ router.post(
   "/",
   auth([userRoles.User]),
   isCartEmpty,
-  isExist({
-    model: couponModel,
-    dataFrom: reqDataForms.body,
-    searchData: uniqueFields.couponCode,
-    isId: false,
-  }),
-  couponMiddleware.couponValidity,
-  couponMiddleware.userValidity,
   orderMiddleware.isProductsOrder,
-  orderMiddleware.orderCard,
   orderMiddleware.orderCash,
   orderController.create
 );

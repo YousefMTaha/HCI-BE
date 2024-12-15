@@ -20,7 +20,7 @@ export const add = asyncHandler(async (req, res, next) => {
           "products.id": req.product._id,
         },
         {
-          "products.$.quantity": req.body.quantity,
+          "products.$.quantity": req.body.quantity || 1,
         }
       )
     : // add the product info to the user cart
@@ -107,12 +107,70 @@ export const remove = asyncHandler(async (req, res, next) => {
     return next(new ModifyError("product not found", StatusCodes.BAD_REQUEST));
 
   // remove the product from cart that match product.id = cart.products.id
-  await cartModel.updateOne(
-    { _id: req.cart._id },
+  const cart = await cartModel.findByIdAndUpdate(
+    req.cart._id,
     {
       $pull: { products: { id: req.product._id } },
+    },
+    {
+      new: true,
     }
   );
+  let totalCartPrice = 0;
+  // for (const product of cart.products) {
+  //   totalCartPrice += (product.quantity || 1) * product.id.price;
+  // }
+  const products = [];
+
+  for (const ele of cart.products) {
+    console.log(ele);
+    
+    const product = await productModel.findById(ele.id._id);
+    // console.log(product);
+
+    totalCartPrice += (ele.quantity || 1) * product.price;
+    const images = product.images.map((ele) => {
+      return ele.secure_url;
+    });
+
+    products.push({
+      product: {
+        ...product._doc,
+        title: product._doc.name,
+        imageCover: product._doc.imageCover.secure_url,
+        images,
+        ratingsQuantity: product._doc.noRating,
+        ratingsAverage: product._doc.totalRating / (product._doc.noRating || 1),
+      },
+
+      price: (ele.quantity || 1) * product.price,
+      count: ele.quantity || 1,
+    });
+  }
+
+  return res.status(200).json({
+    status: "success",
+    data: {
+      products,
+      totalCartPrice,
+      _id: req.user._id,
+    },
+    numOfCartItems: cart.products.length,
+  });
+});
+
+export const clear = asyncHandler(async (req, res, next) => {
+  // remove the product from cart that match product.id = cart.products.id
+  const cart = await cartModel.findByIdAndUpdate(
+    req.cart._id,
+    {
+      products: [],
+    },
+    {
+      new: true,
+    }
+  );
+
   return res.status(200).json({ message: "success" });
 });
 

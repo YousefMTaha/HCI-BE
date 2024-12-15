@@ -11,7 +11,6 @@ export const isProductsOrder = asyncHandler(async (req, res, next) => {
   // check the prorducts of cart is exist ?
   let product = null;
   const orderProductsDB = [];
-  const orderProductsStripe = [];
 
   for (const prod of req.cart.products) {
     // search for product in DB
@@ -22,7 +21,10 @@ export const isProductsOrder = asyncHandler(async (req, res, next) => {
       );
 
     // check the quantity
-    if (!product.check_Stock(prod.quantity)) {
+    console.log(prod.quantity);
+    console.log(product.stock);
+
+    if (!product.check_Stock(prod.quantity || 1)) {
       return next(
         new ModifyError(
           "The stock is empty or the quantity is larger than the stock",
@@ -41,12 +43,6 @@ export const isProductsOrder = asyncHandler(async (req, res, next) => {
       quantity: prod.quantity,
       price: product.price,
     });
-
-    // push the product info needed for payment gateway into the array
-    orderProductsStripe.push({
-      product,
-      quantity: prod.quantity,
-    });
   }
 
   // empty the cart
@@ -55,26 +51,20 @@ export const isProductsOrder = asyncHandler(async (req, res, next) => {
 
   // pass the order product to req
   req.orderProductsDB = orderProductsDB;
-  req.orderProductsStripe = orderProductsStripe;
-  console.log("isProductsOrder");
   next();
 });
 
 export const orderCash = asyncHandler(async (req, res, next) => {
-  if (!(req.body.paymentMethod == paymentMehods.cash)) return next();
-  
   const order = await orderModel.create({
-    address: req.body.address,
+    address: req.body.details,
     createdBy: req.user._id,
     products: req.orderProductsDB,
-    status: orderStatus.chipping,
+    status: orderStatus.Shipping,
     phone: req.body.phone || req.user.phone,
-    descount: req.coupon?.discountPercentage,
-    couponId: req.coupon?._id,
   });
-  
+
   req.order = order;
-  
+
   next();
 });
 
@@ -116,11 +106,10 @@ export const orderCard = asyncHandler(async (req, res, next) => {
     customer_email: req.user.email,
     cancel_url: process.env.SUCCESS_URL,
     success_url: process.env.SUCCESS_URL,
-    discounts: [{ coupon: req.body.stripeCoupon?.id },{}],
+    discounts: [{ coupon: req.body.stripeCoupon?.id }, {}],
     metadata: {
       orderId: order._id.toString(),
       cartId: req.cart._id.toString(),
-      
     },
   });
 

@@ -34,7 +34,7 @@ const initApp = (app, express) => {
   app.use(`/review`, reviewsRouter);
   app.use(`/coupon`, couponRouter);
   app.use(`/cart`, cartRouter);
-  app.use(`/order`, orderRouter);
+  app.use(`/orders`, orderRouter);
   app.use(`/brand`, branRouter);
   app.use(`/wishlist`, wishlistRouter);
 
