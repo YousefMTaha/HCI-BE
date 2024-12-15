@@ -124,7 +124,7 @@ export const remove = asyncHandler(async (req, res, next) => {
 
   for (const ele of cart.products) {
     console.log(ele);
-    
+
     const product = await productModel.findById(ele.id._id);
     // console.log(product);
 

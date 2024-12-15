@@ -25,30 +25,26 @@ import getAllData, { getDataById } from "../../middleware/getData.js";
 import categoryModel from "../../../DB/model/Category.model.js";
 
 const router = Router();
-router.get(
-  "/getUserProducts",
-  auth([userRoles.Admin]),
-  productController.getUserProducts
-);
+router.get("/getUserProducts", auth(), productController.getUserProducts);
 router
   .route("/")
   .post(
-    auth([userRoles.Admin]),
+    auth(),
     fileUpload(fileValidation.image).fields([
       { name: "images", maxCount: 5 },
       { name: "imageCover", maxCount: 1 },
     ]),
 
-    isExist({
-      model: subcategoryModel,
-      dataFrom: reqDataForms.body,
-      searchData: uniqueFields.subcategoryId,
-    }),
-    isExist({
-      model: brandModel,
-      dataFrom: reqDataForms.body,
-      searchData: uniqueFields.brandId,
-    }),
+    // isExist({
+    //   model: subcategoryModel,
+    //   dataFrom: reqDataForms.body,
+    //   searchData: uniqueFields.subcategoryId,
+    // }),
+    // isExist({
+    //   model: brandModel,
+    //   dataFrom: reqDataForms.body,
+    //   searchData: uniqueFields.brandId,
+    // }),
     isExist({
       model: categoryModel,
       dataFrom: reqDataForms.body,
@@ -64,7 +60,7 @@ router
   .route("/:_id")
   .get(validation(IdValidator), productController.getProduct)
   .delete(
-    auth([userRoles.Admin]),
+    auth(),
     validation(IdValidator),
     isExist({ model: productModel }),
     isOwner(productModel),
@@ -72,7 +68,7 @@ router
     productController.removeProduct
   )
   .put(
-    auth([userRoles.Admin]),
+    auth(),
     fileUpload(fileValidation.image).fields([
       { name: "images", maxCount: 5 },
       { name: "imageCover", maxCount: 1 },

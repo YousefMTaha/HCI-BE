@@ -13,7 +13,7 @@ export const uploadImage = ({ model, isArray = false, isFields = false }) => {
           const { public_id, secure_url } = await cloudinary.uploader.upload(
             image.path,
             {
-              folder: `web-project-ecommerce/${modelName}/${req[modelName]._id}`,
+              folder: `HCI-project/${modelName}/${req[modelName]._id}`,
             }
           );
 
@@ -33,7 +33,7 @@ export const uploadImage = ({ model, isArray = false, isFields = false }) => {
             const { public_id, secure_url } = await cloudinary.uploader.upload(
               obj.path,
               {
-                folder: `web-project-ecommerce/${modelName}/${req[modelName]._id}/${field}`,
+                folder: `HCI-project/${modelName}/${req[modelName]._id}/${field}`,
               }
             );
 
@@ -46,7 +46,7 @@ export const uploadImage = ({ model, isArray = false, isFields = false }) => {
         const { public_id, secure_url } = await cloudinary.uploader.upload(
           req.file.path,
           {
-            folder: `web-project-ecommerce/${modelName}/${req[modelName]._id}`,
+            folder: `HCI-project/${modelName}/${req[modelName]._id}`,
           }
         );
 
@@ -76,7 +76,7 @@ export const updateImage = ({ model, isArray = false, isFields = false }) => {
       // delete the pervious images
       if (modelData.images.length) {
         await cloudinary.api.delete_resources_by_prefix(
-          `web-project-ecommerce/${modelName}/${modelData._id}`
+          `HCI-project/${modelName}/${modelData._id}`
         );
       }
 
@@ -87,7 +87,7 @@ export const updateImage = ({ model, isArray = false, isFields = false }) => {
         const { public_id, secure_url } = await cloudinary.uploader.upload(
           image.path,
           {
-            folder: `web-project-ecommerce/${modelName}/${modelData._id}`,
+            folder: `HCI-project/${modelName}/${modelData._id}`,
           }
         );
 
@@ -104,7 +104,7 @@ export const updateImage = ({ model, isArray = false, isFields = false }) => {
           // delete the pervious images
           if (modelData[field].length) {
             await cloudinary.api.delete_resources_by_prefix(
-              `web-project-ecommerce/${modelName}/${modelData._id}/${field}`
+              `HCI-project/${modelName}/${modelData._id}/${field}`
             );
           }
 
@@ -112,7 +112,7 @@ export const updateImage = ({ model, isArray = false, isFields = false }) => {
           const { public_id, secure_url } = await cloudinary.uploader.upload(
             obj.path,
             {
-              folder: `web-project-ecommerce/${modelName}/${modelData._id}/${field}`,
+              folder: `HCI-project/${modelName}/${modelData._id}/${field}`,
             }
           );
 
@@ -129,7 +129,7 @@ export const updateImage = ({ model, isArray = false, isFields = false }) => {
       const { public_id, secure_url } = await cloudinary.uploader.upload(
         req.file.path,
         {
-          folder: `web-project-ecommerce/${modelName}/${modelData._id}`,
+          folder: `HCI-project/${modelName}/${modelData._id}`,
         }
       );
 
@@ -150,7 +150,7 @@ export const deleteImage = (model, isArray = false) => {
 
     if (isArray) {
       await cloudinary.api.delete_resources_by_prefix(
-        `web-project-ecommerce/${modelName}/${modelData._id}`
+        `HCI-project/${modelName}/${modelData._id}`
       );
       modelData.images = [];
       await modelData.save();

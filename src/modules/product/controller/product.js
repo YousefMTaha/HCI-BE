@@ -7,14 +7,12 @@ import { ApiFeatures } from "../../../utils/apiFeatures.js";
 
 export const addProduct = asyncHandler(async (req, res, next) => {
   req.body.createdBy = req.user._id;
-  req.body.subcategoryId = req.subcategory._id;
-  req.body.brandId = req.brand._id;
-  req.body.quantity = await validation.validateNumber(
-    "quantity",
-    req.body.quantity
-  );
+  req.body.stock = await validation.validateNumber("quantity", req.body.stock);
   req.body.price = await validation.validateNumber("price", req.body.price);
   req.product = await productModel.create(req.body);
+
+  console.log(req.files);
+
   return next();
 });
 
@@ -70,7 +68,7 @@ export const getAllProducts = asyncHandler(async (req, res, next) => {
     productModel.find(),
     req.query
   ).pagination();
-  const product = await apiFeatures.mongooseQuery;
+  const product = await productModel.find();
 
   const products = product.map((ele) => {
     const images = ele._doc.images.map((ele) => {
@@ -99,7 +97,7 @@ export const getAllProducts = asyncHandler(async (req, res, next) => {
     results: products.length,
     // NoPage: noPage,
     currentPage: req.query.page,
-    limit: 5,
+    limit: products.length,
   });
 });
 
