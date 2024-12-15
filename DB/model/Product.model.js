@@ -29,6 +29,8 @@ const productSchema = new mongo.Schema(
       required: true,
     },
     stock: { type: Number, default: 1 },
+    totalSold: { type: Number, default: 0 },
+    totalSoldPrice: { type: Number, default: 0 },
     createdBy: { type: mongo.Types.ObjectId, ref: "User", required: true },
     brandId: {
       type: mongo.Types.ObjectId,

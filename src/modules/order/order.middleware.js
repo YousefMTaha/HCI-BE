@@ -21,9 +21,6 @@ export const isProductsOrder = asyncHandler(async (req, res, next) => {
       );
 
     // check the quantity
-    console.log(prod.quantity);
-    console.log(product.stock);
-
     if (!product.check_Stock(prod.quantity || 1)) {
       return next(
         new ModifyError(
@@ -35,6 +32,8 @@ export const isProductsOrder = asyncHandler(async (req, res, next) => {
 
     // update the stock of the product
     product.stock -= prod.quantity;
+    product.totalSold += prod.quantity;
+    product.totalSoldPrice += prod.quantity * product.price;
     await product.save();
 
     // push the product info with the quantity that user want into the array
