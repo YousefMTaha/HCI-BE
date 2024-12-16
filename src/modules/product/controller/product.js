@@ -3,7 +3,10 @@ import productModel from "../../../../DB/model/Product.model.js";
 import { ModifyError } from "../../../utils/classError.js";
 import { asyncHandler } from "../../../utils/errorHandling.js";
 import * as validation from "../product.middleware.js";
-import { sendDeleteNotification } from "../../notification/notification.router.js";
+import {
+  sendDeleteNotification,
+  sendUpdateNotification,
+} from "../../notification/notification.router.js";
 
 export const addProduct = asyncHandler(async (req, res, next) => {
   req.body.createdBy = req.user._id;
@@ -19,11 +22,19 @@ export const addProduct = asyncHandler(async (req, res, next) => {
 export const updateProduct = asyncHandler(async (req, res, next) => {
   const product = await productModel.findOneAndUpdate(
     { _id: req.product._id },
-    req.body,
+    {
+      name: req.body.name,
+      description: req.body.description,
+      category: req.body.category,
+      stock: req.body.stock,
+      price: req.body.price,
+    },
     {
       new: true,
     }
   );
+
+  sendUpdateNotification(req.product._id, product.name);
 
   return res.status(200).json({
     message: "success",
@@ -34,7 +45,7 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
 export const removeProduct = asyncHandler(async (req, res, next) => {
   await req.product.deleteOne();
 
-  await sendDeleteNotification(req.product,req.params._id);
+  await sendDeleteNotification(req.product, req.params._id);
 
   return res.status(200).json({ message: "success" });
 });

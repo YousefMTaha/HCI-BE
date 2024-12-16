@@ -23,7 +23,7 @@ export const markAsRead = asyncHandler(async (req, res) => {
   });
 });
 
-export const sendUpdateNotification = async (productId) => {
+export const sendUpdateNotification = async (productId, productName) => {
   const users = await userModel.aggregate([
     { $unwind: "$wishlist" },
     {
@@ -41,7 +41,7 @@ export const sendUpdateNotification = async (productId) => {
 
   users.forEach(async (user) => {
     await notificationModel.create({
-      content: `the seller of the Product "${req.product.name} that in your wishlist updated it`,
+      content: `the seller of the Product "${productName} that in your wishlist updated it`,
       userId: user._id,
     });
   });
