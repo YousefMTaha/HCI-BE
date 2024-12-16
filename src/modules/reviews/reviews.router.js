@@ -29,6 +29,8 @@ router.get(
   reviewsController.getReviewsOfProduct
 );
 
+router.get("/", auth(), reviewsController.getReviews);
+
 router.post(
   "/",
   auth([userRoles.User]),

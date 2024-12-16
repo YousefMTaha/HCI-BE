@@ -81,3 +81,12 @@ export const deleteReview = asyncHandler(async (req, res, next) => {
 
   return res.json({ messgae: "Reviews Deleted Successfully" });
 });
+
+export const getReviews = async (req, res) => {
+  return res.json({
+    message: "success",
+    data: await reviewModel
+      .find({ sellerId: req.user._id })
+      .populate("createdBy", "name"),
+  });
+};
