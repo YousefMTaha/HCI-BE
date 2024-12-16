@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import notificationModel from "../../../DB/model/notification.model.js";
 import userModel from "../../../DB/model/User.model.js";
 import { asyncHandler } from "../../utils/errorHandling.js";
@@ -5,7 +6,9 @@ import { asyncHandler } from "../../utils/errorHandling.js";
 export const getAllNotification = asyncHandler(async (req, res) => {
   return res.json({
     message: "success",
-    data: await notificationModel.find({ userId: req.user._id }),
+    data: await notificationModel
+      .find({ userId: req.user._id })
+      .sort("-createdAt"),
   });
 });
 
@@ -25,7 +28,10 @@ export const sendUpdateNotification = async (productId) => {
     { $unwind: "$wishlist" },
     {
       $match: {
-        $or: [{ wishlist: productId }, { wishlist: productId.toString() }],
+        $or: [
+          { wishlist: new Types.ObjectId(productId) },
+          { wishlist: new Types.ObjectId(productId).toString() },
+        ],
       },
     },
     {
@@ -41,12 +47,15 @@ export const sendUpdateNotification = async (productId) => {
   });
 };
 
-export const sendDeleteNotification = async (productId) => {
+export const sendDeleteNotification = async (product, productId) => {
   const users = await userModel.aggregate([
     { $unwind: "$wishlist" },
     {
       $match: {
-        $or: [{ wishlist: productId }, { wishlist: productId.toString() }],
+        $or: [
+          { wishlist: new Types.ObjectId(productId) },
+          { wishlist: productId },
+        ],
       },
     },
     {
@@ -54,19 +63,23 @@ export const sendDeleteNotification = async (productId) => {
     },
   ]);
 
-  users.forEach(async (user) => {
-    await notificationModel.create({
-      content: `the seller of the Product "${req.product.name} that in your wishlit deleted it"`,
+  for (const user of users) {
+    const notfi = await notificationModel.create({
+      content: `The seller of the Product "${product.name} that in your wishlist deleted it"`,
       userId: user._id,
     });
+
+    console.log("123");
+
+    console.log({ notfi });
 
     await userModel.updateOne(
       { _id: user._id },
       {
-        $pull: { wishlist: productId },
+        $pull: { wishlist: new Types.ObjectId(productId) },
       }
     );
-  });
+  }
 };
 
 export const sendnewMessageNotification = async (loginUser, otherUser) => {

@@ -73,8 +73,9 @@ export const getOrders = async (req, res, next) => {
     .populate("products.id");
 
   const order = orders.map((order) => {
+    const products = order.products.filter((product) => product.id);
     return {
-      cartItems: order.products.map((ele) => {
+      cartItems: products.map((ele) => {
         const images = ele.id._doc.images.map((ele) => {
           return ele.secure_url;
         });
@@ -96,9 +97,9 @@ export const getOrders = async (req, res, next) => {
     };
   });
 
-  console.log(order);
+  const data = order.filter((order) => order.cartItems.length);
 
   return orders.length
-    ? res.status(200).json({ message: "success", data: order })
+    ? res.status(200).json({ message: "success", data })
     : next(new ModifyError("no orders found", StatusCodes.NOT_FOUND));
 };

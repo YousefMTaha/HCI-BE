@@ -123,7 +123,7 @@ export const remove = asyncHandler(async (req, res, next) => {
   const products = [];
 
   for (const ele of cart.products) {
-    console.log(ele);
+    // console.log(ele);
 
     const product = await productModel.findById(ele.id._id);
     // console.log(product);
@@ -175,9 +175,9 @@ export const clear = asyncHandler(async (req, res, next) => {
 });
 
 export const get = async (req, res, next) => {
-  console.log(req.cart);
+  // console.log(req.cart);
   const cart = req.cart;
-  console.log(cart.products);
+  // console.log(cart.products);
   // console.log(cart.products);
   let totalCartPrice = 0;
 

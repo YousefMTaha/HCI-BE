@@ -37,7 +37,7 @@ export const checkQuantity = asyncHandler(async (req, res, next) => {
 
 export const isCartEmpty = asyncHandler(async (req, res, next) => {
   if (!req.cart.products.length) {
-    console.log(req.cart);
+    // console.log(req.cart);
     console.log("isCartinsideIf");
     return next(new ModifyError("The cart is empty", StatusCodes.BAD_REQUEST));
   }
