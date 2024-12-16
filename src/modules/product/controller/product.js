@@ -64,11 +64,11 @@ export const getAllProducts = asyncHandler(async (req, res, next) => {
   //   .find()
   //   .populate("subcategoryId")
   //   .populate("createdBy");
-  const apiFeatures = new ApiFeatures(
-    productModel.find(),
-    req.query
-  ).pagination();
-  const product = await productModel.find();
+  // const apiFeatures = new ApiFeatures(
+  //   productModel.find(),
+  //   req.query
+  // ).pagination();
+  const product = await productModel.find().populate("category");
 
   const products = product.map((ele) => {
     const images = ele._doc.images.map((ele) => {

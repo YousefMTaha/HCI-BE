@@ -8,9 +8,9 @@ export const setNewSocketId = async (id, newSocket) => {
 
 export const checkToken = async (token) => {
   try {
-    const { _id } = jwt.verify(token, process.env.TOKEN_SIGNATURE);
+    const { id } = jwt.verify(token, process.env.TOKEN_SIGNATURE);
 
-    const user = await userModel.findById(_id);
+    const user = await userModel.findById(id);
     // console.log(user);
 
     return user ? user : null;

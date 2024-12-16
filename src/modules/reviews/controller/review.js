@@ -14,23 +14,25 @@ export const getReviewsOfProduct = asyncHandler(async (req, res, next) => {
 });
 
 export const addReview = asyncHandler(async (req, res, next) => {
+  const { orderId } = req.body;
+
   const rev = await reviewModel.findOne({
-    productId: req.body.productId,
+    orderId: req.body.orderId,
     createdBy: req.user._id,
   });
   if (rev) {
     return next(
       new ModifyError(
-        `You already reviewd this product before`,
+        `You already reviewed this product before`,
         StatusCodes.CONFLICT
       )
     );
   }
-  req.body.createdBy = req.user._id;
-  req.body.productId = req.product._id;
-  req.product.noRating++;
-  req.product.totalRating += req.body.rate;
-  await req.product.save();
+  // req.body.createdBy = req.user._id;
+  // req.body.productId = req.product._id;
+  // req.product.noRating++;
+  // req.product.totalRating += req.body.rate;
+  // await req.product.save();
   const review = await reviewModel.create(req.body);
   return res.json({ messgae: "Reviews Added Successfully", review: review });
 });

@@ -32,6 +32,7 @@ export const uniqueFields = {
   couponId: "couponId",
   couponCode: "code",
   category: "category",
+  orderId: "orderId",
 };
 
 export const orderStatus = {

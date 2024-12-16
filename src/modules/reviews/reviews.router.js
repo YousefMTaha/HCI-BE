@@ -11,6 +11,7 @@ import {
 import { isNotExist } from "../../middleware/isNotExist.js";
 import reviewModel from "../../../DB/model/Review.model.js";
 import { isOwner } from "../../middleware/isOwner.js";
+import orderModel from "../../../DB/model/Order.model.js";
 
 const router = Router();
 
@@ -31,15 +32,15 @@ router.get(
 router.post(
   "/",
   auth([userRoles.User]),
-  isNotExist({
-    model: reviewModel,
-    searchData: "createdBy",
-  }),
-  isExist({
-    model: productModel,
-    dataFrom: reqDataForms.body,
-    searchData: uniqueFields.productId,
-  }),
+  // isNotExist({
+  //   model: reviewModel,
+  //   searchData: "createdBy",
+  // }),
+  // isExist({
+  //   model: orderModel,
+  //   dataFrom: reqDataForms.body,
+  //   searchData: uniqueFields.orderId,
+  // }),
   reviewsController.addReview
 );
 
