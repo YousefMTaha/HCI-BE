@@ -31,13 +31,16 @@ export const addMsg = async (user, data) => {
 };
 
 export const getAllMsgs = async (loginUserId, anotherUserId) => {
-  return await chatModel.find({
-    $or: [
-      { to: loginUserId, from: anotherUserId },
-      {
-        to: anotherUserId,
-        from: loginUserId,
-      },
-    ],
-  });
+  return await chatModel
+    .find({
+      $or: [
+        { to: loginUserId, from: anotherUserId },
+        {
+          to: anotherUserId,
+          from: loginUserId,
+        },
+      ],
+    })
+    .populate("to")
+    .populate("from");
 };

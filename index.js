@@ -6,7 +6,7 @@ const app = express();
 import cors from "cors";
 import morgan from "morgan";
 import { Server } from "socket.io";
-import configSocket from "./src/modules/chat/chat.controller.js";
+import configSocket from "./src/modules/real-time/real-time.config.js";
 import token from "jsonwebtoken";
 app.use(express.json());
 app.use(morgan("tiny"), (req, res, next) => {

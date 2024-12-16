@@ -4,6 +4,8 @@ import { ModifyError } from "../../../utils/classError.js";
 import { asyncHandler } from "../../../utils/errorHandling.js";
 import * as validation from "../product.middleware.js";
 import { ApiFeatures } from "../../../utils/apiFeatures.js";
+import userModel from "../../../../DB/model/User.model.js";
+import notificationModel from "../../../../DB/model/notification.model.js";
 
 export const addProduct = asyncHandler(async (req, res, next) => {
   req.body.createdBy = req.user._id;
@@ -24,9 +26,47 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
       new: true,
     }
   );
+
+  const users = await userModel.aggregate([
+    { $unwind: "$wishlist" },
+    {
+      $match: {
+        $or: [
+          { wishlist: req.product._id },
+          { wishlist: req.product._id.toString() },
+        ],
+      },
+    },
+    {
+      $lookup: {
+        as: "product",
+        foreignField: "_id",
+        localField: "wishlist",
+        from: "products",
+      },
+    },
+
+    {
+      $addFields: { productName: "$product.name" },
+    },
+    { $unwind: "$productName" },
+
+    {
+      $project: { _id: 1, productName: 1 },
+    },
+  ]);
+
+  users.forEach(async (user) => {
+    await notificationModel.create({
+      content: `the Product ${user.productName} in your wishlist has been updated, check the new details`,
+      userId: user._id,
+    });
+  });
+
   return res.status(200).json({
     message: "success",
-    product,
+    // product,
+    users,
   });
 });
 
@@ -102,7 +142,9 @@ export const getAllProducts = asyncHandler(async (req, res, next) => {
 });
 
 export const getUserProducts = asyncHandler(async (req, res, next) => {
-  const products = await productModel.find({ createdBy: req.user._id });
+  const products = await productModel
+    .find({ createdBy: req.user._id })
+    .populate("category");
   return products.length
     ? res.status(200).json({ message: "success", products })
     : next(new ModifyError("no products found", StatusCodes.NOT_FOUND));
