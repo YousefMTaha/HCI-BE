@@ -40,7 +40,5 @@ const reviewSchema = new mongo.Schema(
   }
 );
 
-reviewSchema.index({ createdBy: 1, productId: 1 }, { unique: true });
-
 const reviewModel = mongo.model("Review", reviewSchema);
 export default reviewModel;

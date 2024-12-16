@@ -2,6 +2,7 @@ import { StatusCodes } from "http-status-codes";
 import reviewModel from "../../../../DB/model/Review.model.js";
 import { ModifyError } from "../../../utils/classError.js";
 import { asyncHandler } from "../../../utils/errorHandling.js";
+import orderModel from "../../../../DB/model/Order.model.js";
 
 export const getReviewsOfProduct = asyncHandler(async (req, res, next) => {
   const reviews = await reviewModel.find({ productId: req.params._id });
@@ -14,27 +15,51 @@ export const getReviewsOfProduct = asyncHandler(async (req, res, next) => {
 });
 
 export const addReview = asyncHandler(async (req, res, next) => {
-  const { orderId } = req.body;
+  const [order] = await orderModel
+    .find({ createdBy: req.user._id })
+    .sort("-createdAt")
+    .limit(1)
+    .populate({
+      select: "products",
+      path: "products.id",
+      populate: { path: "createdBy", select: "_id" },
+    });
 
   const rev = await reviewModel.findOne({
-    orderId: req.body.orderId,
+    orderId: order._id,
     createdBy: req.user._id,
   });
   if (rev) {
     return next(
       new ModifyError(
-        `You already reviewed this product before`,
+        `You already reviewed this order before`,
         StatusCodes.CONFLICT
       )
     );
   }
+
+  const sellersId = [];
+  for (const product of order.products) {
+    const sellerId = product.id.createdBy._id;
+    if (!sellersId.includes(sellerId)) {
+      sellersId.push(sellerId);
+      await reviewModel.create({
+        rate: req.body.rating,
+        review: req.body.review,
+        createdBy: req.user._id,
+        sellerId: sellerId,
+        orderId: order._id,
+      });
+    }
+  }
+
   // req.body.createdBy = req.user._id;
   // req.body.productId = req.product._id;
   // req.product.noRating++;
   // req.product.totalRating += req.body.rate;
   // await req.product.save();
-  const review = await reviewModel.create(req.body);
-  return res.json({ messgae: "Reviews Added Successfully", review: review });
+
+  return res.json({ message: "success" });
 });
 
 export const updateReview = asyncHandler(async (req, res, next) => {

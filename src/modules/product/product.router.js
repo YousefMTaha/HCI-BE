@@ -3,10 +3,8 @@ import auth from "../../middleware/auth.js";
 import { isNotExist } from "../../middleware/isNotExist.js";
 import productModel from "../../../DB/model/Product.model.js";
 import * as productController from "./controller/product.js";
-import * as validator from "./product.validation.js";
 import { isExist } from "../../middleware/isExist.js";
 import { isOwner } from "../../middleware/isOwner.js";
-import subcategoryModel from "../../../DB/model/Subcategory.model.js";
 import {
   fileValidation,
   reqDataForms,
@@ -54,7 +52,7 @@ router
     productController.addProduct,
     uploadImage({ model: productModel, isFields: true })
   )
-  .get(productController.getAllProducts);
+  .get(auth(), productController.getAllProducts);
 
 router
   .route("/:_id")

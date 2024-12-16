@@ -4,6 +4,7 @@ import branRouter from "./modules/brand/brand.router.js";
 import cartRouter from "./modules/cart/cart.router.js";
 import categoryRouter from "./modules/category/category.router.js";
 import couponRouter from "./modules/coupon/coupon.router.js";
+import notificationRouter from "./modules/notification/notification.controller.js";
 import orderRouter from "./modules/order/order.router.js";
 import productRouter from "./modules/product/product.router.js";
 import reviewsRouter from "./modules/reviews/reviews.router.js";
@@ -37,6 +38,7 @@ const initApp = (app, express) => {
   app.use(`/orders`, orderRouter);
   app.use(`/brand`, branRouter);
   app.use(`/wishlist`, wishlistRouter);
+  app.use(`/notification`, notificationRouter);
 
   app.all("*", (req, res, next) =>
     res.send("In-valid Routing Plz check url  or  method")

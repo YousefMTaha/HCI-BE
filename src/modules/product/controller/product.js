@@ -3,9 +3,7 @@ import productModel from "../../../../DB/model/Product.model.js";
 import { ModifyError } from "../../../utils/classError.js";
 import { asyncHandler } from "../../../utils/errorHandling.js";
 import * as validation from "../product.middleware.js";
-import { ApiFeatures } from "../../../utils/apiFeatures.js";
-import userModel from "../../../../DB/model/User.model.js";
-import notificationModel from "../../../../DB/model/notification.model.js";
+import { sendDeleteNotification } from "../../notification/notification.router.js";
 
 export const addProduct = asyncHandler(async (req, res, next) => {
   req.body.createdBy = req.user._id;
@@ -27,51 +25,17 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
     }
   );
 
-  const users = await userModel.aggregate([
-    { $unwind: "$wishlist" },
-    {
-      $match: {
-        $or: [
-          { wishlist: req.product._id },
-          { wishlist: req.product._id.toString() },
-        ],
-      },
-    },
-    {
-      $lookup: {
-        as: "product",
-        foreignField: "_id",
-        localField: "wishlist",
-        from: "products",
-      },
-    },
-
-    {
-      $addFields: { productName: "$product.name" },
-    },
-    { $unwind: "$productName" },
-
-    {
-      $project: { _id: 1, productName: 1 },
-    },
-  ]);
-
-  users.forEach(async (user) => {
-    await notificationModel.create({
-      content: `the Product ${user.productName} in your wishlist has been updated, check the new details`,
-      userId: user._id,
-    });
-  });
-
   return res.status(200).json({
     message: "success",
-    // product,
-    users,
+    data: product,
   });
 });
 
 export const removeProduct = asyncHandler(async (req, res, next) => {
   await req.product.deleteOne();
+
+  sendDeleteNotification(req.params.id);
+
   return res.status(200).json({ message: "success" });
 });
 
@@ -108,7 +72,9 @@ export const getAllProducts = asyncHandler(async (req, res, next) => {
   //   productModel.find(),
   //   req.query
   // ).pagination();
-  const product = await productModel.find().populate("category");
+  const product = await productModel
+    .find({ createdBy: { $ne: req.user._id } })
+    .populate("category");
 
   const products = product.map((ele) => {
     const images = ele._doc.images.map((ele) => {
