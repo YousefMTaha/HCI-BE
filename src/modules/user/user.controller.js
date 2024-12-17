@@ -53,7 +53,7 @@ export const getUserById = asyncHandler(async (id) => {
   return await userModel.findById(id);
 });
 
-export const updateUserChats = asyncHandler(async (userId1, userId2) => {
+export const addChat = asyncHandler(async (userId1, userId2) => {
   await userModel.updateOne(
     { _id: userId1 },
     { $addToSet: { chats: userId2 } }

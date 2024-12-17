@@ -45,3 +45,10 @@ export const getAllMsgs = async (loginUserId, anotherUserId) => {
     .populate("to", "name")
     .populate("from", "name");
 };
+
+
+export const addChat = asyncHandler(async (loginUser,otherUser)=>{
+  
+  await userModel.updateOne()
+
+})

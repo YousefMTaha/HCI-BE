@@ -1,6 +1,6 @@
 import userModel from "../../../DB/model/User.model.js";
 import * as socketService from "../real-time/chat.service.js";
-import { getUserById, updateUserChats } from "../user/user.controller.js";
+import { getUserById, addChat } from "../user/user.controller.js";
 
 function configSocket(io) {
   io.on("connection", (socket) => {
@@ -28,8 +28,6 @@ function configSocket(io) {
         console.log("addMsg: ", user.name, " data: ", data);
 
         const userReciver = await getUserById(data.to);
-
-        await updateUserChats(user._id, userReciver._id);
 
         io.to([userReciver.socketId, user.socketId]).emit("newMessage", {
           from: user._id,
@@ -107,6 +105,14 @@ function configSocket(io) {
       });
 
       socket.emit("retrieveChats", chats);
+    });
+
+    socket.on("addChat", async (data) => {
+      console.log("addchat");
+
+      const user = await socketService.checkToken(data.token);
+
+      addChat(user._id, data.id);
     });
   });
 }
