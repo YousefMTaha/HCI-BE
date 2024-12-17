@@ -48,3 +48,18 @@ export const remove = asyncHandler(async (req, res, next) => {
   await req.user.deleteOne();
   return res.status(200).json({ message: "success" });
 });
+
+export const getUserById = asyncHandler(async (id) => {
+  return await userModel.findById(id);
+});
+
+export const updateUserChats = asyncHandler(async (userId1, userId2) => {
+  await userModel.updateOne(
+    { _id: userId1 },
+    { $addToSet: { chats: userId2 } }
+  );
+  await userModel.updateOne(
+    { _id: userId2 },
+    { $addToSet: { chats: userId1 } }
+  );
+});

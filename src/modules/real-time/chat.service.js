@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import userModel from "../../../DB/model/User.model.js";
 import { chatModel } from "../../../DB/model/chat.model.js";
+import { asyncHandler } from "../../utils/errorHandling.js";
 
 export const setNewSocketId = async (id, newSocket) => {
   await userModel.updateOne({ _id: id }, { socketId: newSocket });
@@ -10,7 +11,7 @@ export const checkToken = async (token) => {
   try {
     const { id } = jwt.verify(token, process.env.TOKEN_SIGNATURE);
 
-    const user = await userModel.findById(id);
+    const user = await userModel.findById(id).populate("chats");
     // console.log(user);
 
     return user ? user : null;
@@ -41,6 +42,6 @@ export const getAllMsgs = async (loginUserId, anotherUserId) => {
         },
       ],
     })
-    .populate("to")
-    .populate("from");
+    .populate("to", "name")
+    .populate("from", "name");
 };

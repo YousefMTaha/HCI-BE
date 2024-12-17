@@ -19,7 +19,7 @@ router.get("/", auth(), get);
 // Add product to cart
 router.post(
   "/",
-  auth([userRoles.User]),
+  auth(),
   //validation(validator.add),
   isExist({
     model: productModel,

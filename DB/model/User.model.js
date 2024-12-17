@@ -44,6 +44,12 @@ const userSchema = new Schema(
         ref: "Product",
       },
     ],
+    chats: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
     socketId: String,
   },
   {

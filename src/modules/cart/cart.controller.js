@@ -12,6 +12,10 @@ two conditions:
 
 export const add = asyncHandler(async (req, res, next) => {
   // check if the product is already exist in the cart
+
+  console.log(req.product);
+  console.log("req.product");
+
   req.body.productExist
     ? // update quantity of the exist product in the cart
       await cartModel.updateOne(

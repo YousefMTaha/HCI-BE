@@ -67,6 +67,7 @@ const auth = (roles = Object.values(userRoles)) => {
         product.id = await productModel.findById(product.id);
       }
     }
+
     // add the user cart object to the request object so it can be accessed throw the other middlewares
     req.cart = cart;
 

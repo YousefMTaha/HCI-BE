@@ -11,7 +11,7 @@ two conditions:
 export const isProductExistInCart = asyncHandler(async (req, res, next) => {
   // check if the product is already in the cart
   req.cart.products.forEach((ele) => {
-    if (ele.id._id.toString() == req.params.productId) {
+    if (ele.id?._id.toString() == req.params.productId) {
       req.body.quantity += ele.quantity;
       req.body.productExist = true;
       return;
