@@ -177,29 +177,66 @@ export const clear = asyncHandler(async (req, res, next) => {
 export const get = async (req, res, next) => {
   // console.log(req.cart);
   const cart = req.cart;
-  // console.log(cart.products);
-  // console.log(cart.products);
+
+  const news = await cartModel
+    .findByIdAndUpdate(
+      { _id: req.cart._id },
+
+      { $pull: { products: { id: null } } },
+      { new: true }
+    )
+    .populate("products.id");
+
   let totalCartPrice = 0;
 
-  const products = cart.products.map((ele) => {
-    totalCartPrice += (ele.quantity || 1) * ele.id.price;
-    const images = ele.id._doc.images.map((ele) => {
-      return ele.secure_url;
-    });
-    return {
-      product: {
-        ...ele.id._doc,
-        title: ele.id._doc.name,
-        imageCover: ele.id._doc.imageCover.secure_url,
-        images,
-        ratingsQuantity: ele.id._doc.noRating,
-        ratingsAverage: ele.id._doc.totalRating / (ele.id._doc.noRating || 1),
-      },
+  const products = cart.products
+    .map((ele) => {
+      if (!ele.id) {
+        return false;
+      }
+      totalCartPrice += (ele.quantity || 1) * ele.id.price;
+      const images = ele.id._doc.images.map((ele) => {
+        return ele.secure_url;
+      });
+      return {
+        product: {
+          ...ele.id._doc,
+          title: ele.id._doc.name,
+          imageCover: ele.id._doc.imageCover.secure_url,
+          images,
+          ratingsQuantity: ele.id._doc.noRating,
+          ratingsAverage: ele.id._doc.totalRating / (ele.id._doc.noRating || 1),
+        },
 
-      price: (ele.quantity || 1) * ele.id.price,
-      count: ele.quantity || 1,
-    };
-  });
+        price: (ele.quantity || 1) * ele.id.price,
+        count: ele.quantity || 1,
+      };
+    })
+    .filter((ele) => ele);
+  // const products = cart.products
+  //   .map((ele) => {
+  //     if (!ele.id) {
+  //       return false;
+  //     }
+  //     totalCartPrice += (ele.quantity || 1) * ele.id.price;
+  //     const images = ele.id._doc.images.map((ele) => {
+  //       return ele.secure_url;
+  //     });
+  //     return {
+  //       product: {
+  //         ...ele.id._doc,
+  //         title: ele.id._doc.name,
+  //         imageCover: ele.id._doc.imageCover.secure_url,
+  //         images,
+  //         ratingsQuantity: ele.id._doc.noRating,
+  //         ratingsAverage: ele.id._doc.totalRating / (ele.id._doc.noRating || 1),
+  //       },
+
+  //       price: (ele.quantity || 1) * ele.id.price,
+  //       count: ele.quantity || 1,
+  //     };
+  //   })
+  //   .filter((ele) => ele);
 
   return res.status(200).json({
     status: "success",

@@ -19,14 +19,25 @@ export const update = asyncHandler(async (req, res, next) => {
       new ModifyError("Email is already taken", StatusCodes.CONFLICT)
     );
 
+  console.log(
+    "======================================================================="
+  );
+
+  console.log(req.body.name, req.body.email);
+  console.log(
+    "======================================================================="
+  );
   const user = await userModel.findOneAndUpdate(
     { _id: req.user._id },
-    req.body,
+    {
+      name: req.body.name,
+      email: req.body.email,
+    },
     { new: true }
   ); // update data into DB
 
   const token = jwt.sign(
-    { email, name: user.name, _id: user._id },
+    { email: req.body.email, name: user.name, id: user._id },
     process.env.TOKEN_SIGNATURE
   );
 
