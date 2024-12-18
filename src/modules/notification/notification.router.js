@@ -83,10 +83,8 @@ export const sendDeleteNotification = async (product, productId) => {
 };
 
 export const sendnewMessageNotification = async (loginUser, otherUser) => {
-  users.forEach(async (user) => {
-    await notificationModel.create({
-      content: `You have recieved msg from "${otherUser}"`,
-      userId: loginUser,
-    });
+  await notificationModel.create({
+    content: `You have recieved msg from "${loginUser.name}"`,
+    userId: otherUser,
   });
 };

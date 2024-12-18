@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import userModel from "../../../DB/model/User.model.js";
 import { chatModel } from "../../../DB/model/chat.model.js";
 import { asyncHandler } from "../../utils/errorHandling.js";
+import { sendnewMessageNotification } from "../notification/notification.router.js";
 
 export const setNewSocketId = async (id, newSocket) => {
   await userModel.updateOne({ _id: id }, { socketId: newSocket });
@@ -29,6 +30,8 @@ export const addMsg = async (user, data) => {
     to,
     content: message,
   });
+
+  // await sendnewMessageNotification(user, to);
 };
 
 export const getAllMsgs = async (loginUserId, anotherUserId) => {
