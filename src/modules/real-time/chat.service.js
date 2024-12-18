@@ -31,7 +31,7 @@ export const addMsg = async (user, data) => {
     content: message,
   });
 
-  // await sendnewMessageNotification(user, to);
+  await sendnewMessageNotification(user, to);
 };
 
 export const getAllMsgs = async (loginUserId, anotherUserId) => {
