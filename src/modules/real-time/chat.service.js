@@ -32,23 +32,19 @@ export const addMsg = async (user, data) => {
 };
 
 export const getAllMsgs = async (loginUserId, anotherUserId) => {
-  return await chatModel
-    .find({
-      $or: [
-        { to: loginUserId, from: anotherUserId },
-        {
-          to: anotherUserId,
-          from: loginUserId,
-        },
-      ],
-    })
-    .populate("to", "name")
-    .populate("from", "name");
+  return await chatModel.find({
+    $or: [
+      { to: loginUserId, from: anotherUserId },
+      {
+        to: anotherUserId,
+        from: loginUserId,
+      },
+    ],
+  });
+  // .populate("to", "name")
+  // .populate("from", "name");
 };
 
-
-export const addChat = asyncHandler(async (loginUser,otherUser)=>{
-  
-  await userModel.updateOne()
-
-})
+export const addChat = asyncHandler(async (loginUser, otherUser) => {
+  await userModel.updateOne();
+});

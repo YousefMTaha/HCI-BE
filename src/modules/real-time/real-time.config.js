@@ -25,9 +25,11 @@ function configSocket(io) {
         console.log("addMsg");
         const user = await socketService.checkToken(data.token);
 
-        console.log("addMsg: ", user.name, " data: ", data);
+        // console.log("addMsg: ", user.name, " data: ", data);
 
         const userReciver = await getUserById(data.to);
+
+        await socketService.addMsg(user, data);
 
         io.to([userReciver.socketId, user.socketId]).emit("newMessage", {
           from: user._id,
@@ -44,10 +46,12 @@ function configSocket(io) {
         console.log("getMessages");
         console.log(data);
         const user = await socketService.checkToken(data.token);
-        const msgs = await socketService.getAllMsgs(user._id, data.to);
-        console.log("getMessages: ", user.name);
 
-        const user2 = await userModel.findById(data.to);
+        const msgs = await socketService.getAllMsgs(user._id, data.id);
+        console.log("getMessages: ", user.name);
+        console.log("getMessages: ", msgs);
+
+        const user2 = await userModel.findById(data.id);
 
         // console.log(msgs);
         // const res = {
@@ -101,6 +105,7 @@ function configSocket(io) {
         return {
           name: ele.name,
           id: ele._id,
+          messages: [],
         };
       });
 
