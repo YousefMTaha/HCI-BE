@@ -1,3 +1,4 @@
+import { chatModel } from "../../../DB/model/chat.model.js";
 import userModel from "../../../DB/model/User.model.js";
 import * as socketService from "../real-time/chat.service.js";
 import { getUserById, addChat } from "../user/user.controller.js";
@@ -31,11 +32,14 @@ function configSocket(io) {
 
         await socketService.addMsg(user, data);
 
-        io.to([userReciver.socketId, user.socketId]).emit("newMessage", {
-          from: user._id,
-          to: data.to,
-          message: data.message,
+        const chats = await chatModel.find({
+          $or: [
+            { from: user._id, to: data.to },
+            { from: data.to, to: user._id },
+          ],
         });
+
+        io.to([userReciver.socketId, user.socketId]).emit("newMessage", chats);
       } catch (error) {
         console.log(error);
       }
